@@ -61,7 +61,6 @@ class Record:
                 return p
         return None
     
-    @input_error
     def add_birthday(self, args, book):
         name, bdate = args
         birthday = Birthday(bdate)
@@ -73,7 +72,8 @@ class Record:
             return "Already have"
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        formatted_date = self.birthday.value.strftime("%d.%m.%Y") if self.birthday else "N/A"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birthday: {formatted_date}"
 
 class AddressBook(UserDict):
     def add_record(self, record):
@@ -86,7 +86,6 @@ class AddressBook(UserDict):
         if not self.data.pop(name, None):
             raise NameError("Contact not found")
     
-    @input_error
     def get_upcoming_birthdays(self):
         tdate = dtdt.today().date()
         birthdays = []
@@ -98,7 +97,7 @@ class AddressBook(UserDict):
                 days_between = (bdate_this_year - tdate).days
 
                 if 0 <= days_between <= 7:
-                    birthdays.append({'name': record.name.value, 'birthday': bdate_this_year.strftime("%d.%m.%Y")})
+                    birthdays.append({'name': record.name.value, 'birthday': bdate_this_year.strftime("%A")})
         return birthdays
 
 @input_error
@@ -138,12 +137,13 @@ def change_contact(args, book):
 @input_error
 def all_contact(book):
     if book:
-        result =""
+        result = ""
         for record in book.values():
             result += f"{str(record)}\n"
         return result.strip()
     else:
         return "Not found"
+
 
 @input_error
 def add_birthday(args, book):
@@ -162,6 +162,7 @@ def show_birthday(args, book):
         return record.birthday.value.strftime("%d.%m.%Y")
     return "Not found"
 
+@input_error
 def birthdays(args, book):
     upcoming_birthdays = book.get_upcoming_birthdays()
     result = ""
