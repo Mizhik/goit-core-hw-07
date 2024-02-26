@@ -1,8 +1,21 @@
 import sys
 from collections import UserDict
-from decorator import input_error
 
-from datetime import datetime as dtdt, timedelta
+from datetime import datetime as dtdt
+
+def input_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError as ve:
+            return f"Value error: {ve}"
+        except KeyError:
+            return "No such name found"
+        except IndexError:
+            return "Not found"
+
+    return inner
+
 
 class Field:
     def __init__(self, value):
@@ -61,10 +74,8 @@ class Record:
                 return p
         return None
     
-    def add_birthday(self, args, book):
-        name, bdate = args
+    def add_birthday(self, bdate):
         birthday = Birthday(bdate)
-
         if not self.birthday:
             self.birthday = birthday
             return "Birthday added."
@@ -150,7 +161,7 @@ def add_birthday(args, book):
     name, bdate = args
     record = book.find(name)
     if record:
-        return record.add_birthday([name, bdate], book)
+        return record.add_birthday(bdate)
     else:
         return "Contact not found"
 
@@ -163,7 +174,7 @@ def show_birthday(args, book):
     return "Not found"
 
 @input_error
-def birthdays(args, book):
+def birthdays(book):
     upcoming_birthdays = book.get_upcoming_birthdays()
     result = ""
     if upcoming_birthdays:
@@ -202,13 +213,13 @@ def main():
             print(all_contact(book))
 
         elif command == "add-birthday":
-            print(add_birthday(args, book))
+            print(add_birthday(args,book))
 
         elif command == "show-birthday":
             print(show_birthday(args, book))
 
         elif command == "birthdays":
-            print(birthdays(args, book))
+            print(birthdays(book))
         else:
             print("Invalid command.")
 
