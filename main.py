@@ -110,6 +110,12 @@ class AddressBook(UserDict):
                 if 0 <= days_between <= 7:
                     birthdays.append({'name': record.name.value, 'birthday': bdate_this_year.strftime("%A")})
         return birthdays
+    
+    def __str__(self):
+        result = ""
+        for record in self.values():
+            result += f"{str(record)}\n"
+        return result.strip()
 
 @input_error
 def parse_input(user_input):
@@ -147,13 +153,7 @@ def change_contact(args, book):
 
 @input_error
 def all_contact(book):
-    if book:
-        result = ""
-        for record in book.values():
-            result += f"{str(record)}\n"
-        return result.strip()
-    else:
-        return "Not found"
+   return str(book) if book else "Not found"
 
 
 @input_error
@@ -169,7 +169,7 @@ def add_birthday(args, book):
 def show_birthday(args, book):
     name = args[0]
     record = book.find(name)
-    if record and record.birthday:
+    if record:
         return record.birthday.value.strftime("%d.%m.%Y")
     return "Not found"
 
