@@ -108,7 +108,7 @@ class AddressBook(UserDict):
                 days_between = (bdate_this_year - tdate).days
 
                 if 0 <= days_between <= 7:
-                    birthdays.append({'name': record.name.value, 'birthday': bdate_this_year.strftime("%A")})
+                    birthdays.append({'name': record.name.value, 'birthday': (bdate_this_year.strftime("%A"),bdate_this_year.strftime("%d.%m.%Y"))})
         return birthdays
     
     def __str__(self):
@@ -179,7 +179,7 @@ def birthdays(book):
     result = ""
     if upcoming_birthdays:
         for birthday_info in upcoming_birthdays:
-            result += f"{birthday_info['name']}'s birthday is on {birthday_info['birthday']}\n"
+             result += f"{birthday_info['name']}'s birthday is on {birthday_info['birthday'][0]}, {birthday_info['birthday'][1]}.\n"
         return result.strip()
     else:
         return "No upcoming birthdays."
