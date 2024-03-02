@@ -1,7 +1,8 @@
 import sys
 from collections import UserDict
 
-from datetime import datetime as dtdt
+import datetime as dt 
+from datetime import datetime as dtdt , timedelta
 
 def input_error(func):
     def inner(*args, **kwargs):
@@ -98,17 +99,23 @@ class AddressBook(UserDict):
             raise NameError("Contact not found")
     
     def get_upcoming_birthdays(self):
-        tdate = dtdt.today().date()
-        birthdays = []
+        tdate = dtdt.today().date() 
+        birthdays = [] 
 
-        for record in self.values():
-            bdate = record.birthday
-            if bdate:
-                bdate_this_year = bdate.value.replace(year=tdate.year)
-                days_between = (bdate_this_year - tdate).days
+        for record in self.values():  
+            bdate  = record.birthday
+            bdate_this_year = bdate.value.replace(year=tdate.year)
+            week_day = bdate_this_year.isoweekday()
+            days_between = (bdate_this_year - tdate).days
 
-                if 0 <= days_between <= 7:
+            if 0 <= days_between < 7:  
+                if week_day < 6: 
                     birthdays.append({'name': record.name.value, 'birthday': bdate_this_year.strftime("%A, %d.%m.%Y")})
+                else:
+                    if (bdate_this_year + dt.timedelta(days=1)).weekday() == 0:  
+                        birthdays.append({'name': record.name.value, 'birthday': (bdate_this_year + dt.timedelta(days=1)).strftime("%A, %d.%m.%Y")})
+                    elif (bdate_this_year + dt.timedelta(days=2)).weekday() == 0:
+                        birthdays.append({'name': record.name.value, 'birthday': (bdate_this_year + dt.timedelta(days=2)).strftime("%A, %d.%m.%Y")})
         return birthdays
     
     def __str__(self):
@@ -179,7 +186,7 @@ def birthdays(book: AddressBook):
     if upcoming_birthdays:
         result = ""
         for birthday_info in upcoming_birthdays:
-            result += f"{birthday_info['name']}'s birthday is on {birthday_info['birthday']}.\n"
+            result += f"to congratulate {birthday_info['name']}'s on {birthday_info['birthday']}.\n"
         return result.strip()
     else:
         return 'Not upcoming birthdays'
